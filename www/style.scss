@@ -58,6 +58,7 @@ body {
     div.title {
         grid-area: title;
         overflow-x: hidden;
+        white-space: nowrap;
     }
 
     button.close {
