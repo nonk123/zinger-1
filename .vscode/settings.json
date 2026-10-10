@@ -1,6 +1,16 @@
 {
-    "Lua.workspace.library": ["_sanity.lua"],
+    "editor.formatOnSaveMode": "file",
+    "Lua.workspace.library": [
+        "_sanity.lua"
+    ],
     "search.exclude": {
         "dist/**": true,
+    },
+    "[javascript]": {
+        "editor.formatOnSave": true,
+    },
+    "[scss]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "vscode.css-language-features"
     }
 }
