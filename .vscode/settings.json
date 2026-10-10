@@ -1,0 +1,6 @@
+{
+    "Lua.workspace.library": ["_sanity.lua"],
+    "search.exclude": {
+        "dist/**": true,
+    }
+}
