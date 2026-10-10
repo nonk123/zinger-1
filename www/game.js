@@ -1,13 +1,18 @@
-document.addEventListener("DOMContentLoaded", function () {
-    function fatal(reason) {
-        FATALITY.textContent = String(reason);
-        ROOT.classList.add("fatal");
-        FATAL.style.display = "block";
-    }
+function fatal(reason) {
+    FATALITY.textContent = String(reason);
+    ROOT.classList.add("fatal");
+    FATAL.style.display = "block";
+    GAME.style.display = "none";
+}
 
-    fetch("/citizens.json").then(r => r.json()).then(CITIZENS => {
-        const msg = `hiii ${CITIZENS.length} citizens!!!`;
-        fatal(msg);
-        console.info(msg);
-    }).catch(reason => fatal(reason))
+function die() {
+    fatal("im ded :(");
+}
+
+function main(CITIZENS) {
+    console.info(`hiii ${CITIZENS.length} citizens!!!`);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetch("/citizens.json").then(r => r.json()).then(main).catch(reason => fatal(reason))
 });
