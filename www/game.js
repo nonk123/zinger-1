@@ -45,9 +45,14 @@ function preload(citizen) {
     const img = document.createElement("img");
     img.src = `https://neonaut.neocities.org${citizen.img}`;
 
+    const anchor = document.createElement("a");
+    anchor.href = `https://${citizen.link}`;
+    anchor.addEventListener("click", ev => ev.preventDefault());
+    anchor.appendChild(img);
+
     const scaler = document.createElement("div");
     scaler.classList.add("scaler");
-    scaler.appendChild(img);
+    scaler.appendChild(anchor);
 
     const crutch = document.createElement("div");
     crutch.classList.add("crutch");
