@@ -81,17 +81,11 @@ body {
 
     div.crutch {
         grid-area: img;
-
-        display: inline-block;
-        cursor: pointer;
-
         width: $width;
         height: $height;
     }
 
     div.scaler {
-        display: block;
-
         transform: scale($scale);
         transform-origin: top left;
 
@@ -99,9 +93,9 @@ body {
         image-rendering: -moz-crisp-edges;
         image-rendering: crisp-edges;
         image-rendering: pixelated;
-    }
 
-    div.scaler>img {
-        display: block;
+        >img {
+            cursor: pointer;
+        }
     }
 }
