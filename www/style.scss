@@ -61,6 +61,8 @@ body {
     }
 
     button.close {
+        cursor: pointer;
+
         font: $butt monospace;
         line-height: $butt;
 
