@@ -96,6 +96,18 @@ const game = {
     }
 };
 
+const kb = {};
+
+window.addEventListener("keydown", ev => {
+    console.info(`${ev.code} down`);
+    kb[ev.code] = true;
+});
+
+window.addEventListener("keyup", ev => {
+    console.info(`${ev.code} up`);
+    kb[ev.code] = false;
+});
+
 const gsm = {
     Test: {
         init() {
@@ -110,8 +122,7 @@ const gsm = {
         },
 
         tick() {
-            console.info("this should repeat indefinitely");
-            return true;
+            return !kb["Escape"];
         }
     }
 };
@@ -121,13 +132,22 @@ function main(citizens) {
     game.push(gsm.Test);
 
     function tick() {
-        if (game.gamestate.length === 0) return;
+        function end() {
+            fatal("you killed the game!!!");
+        }
+
+        if (game.gamestate.length === 0)
+            end();
+
         const gs = game.gamestate[game.gamestate.length - 1];
+
         if (!("tick" in gs) || gs.tick() === true)
             requestAnimationFrame(tick);
+        else
+            end();
     }
 
-    tick();
+    requestAnimationFrame(tick);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
