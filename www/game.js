@@ -83,11 +83,12 @@ function main(CITIZENS) {
     }
 
     const dx = 200, dy = 100;
+    const cols = 5, count = 40;
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < count; i++) {
         const wnd = preloadNext();
         wnd.setVisible(true);
-        wnd.setPosition(12 + (i % 4) * dx, 12 + Math.floor(i / 4) * dy);
+        wnd.setPosition(12 + (i % cols) * dx, 12 + Math.floor(i / cols) * dy);
     }
 }
 
