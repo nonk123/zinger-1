@@ -23,7 +23,6 @@ function die() {
 
 function preload(citizen) {
     const wnd = document.createElement("div");
-    wnd.style.display = "none";
     wnd.classList.add("ad");
 
     const close = document.createElement("button");
@@ -62,6 +61,17 @@ function preload(citizen) {
     wnd.appendChild(close);
     wnd.appendChild(crutch);
 
+    wnd.setVisible = function (visible) {
+        this.style.display = visible ? "grid" : "none";
+    };
+
+    wnd.setPosition = function (x, y) {
+        this.style.position = "absolute";
+        this.style.left = `${x}px`;
+        this.style.top = `${y}px`;
+    }
+
+    wnd.setVisible(false);
     BUTTONS.appendChild(wnd);
 
     return wnd;
@@ -72,14 +82,12 @@ function main(CITIZENS) {
         return preload(CITIZENS.pick());
     }
 
-    for (let i = 0; i < 20; i++) {
-        const dx = 200, dy = 100;
+    const dx = 200, dy = 100;
 
+    for (let i = 0; i < 20; i++) {
         const wnd = preloadNext();
-        wnd.style.display = "grid";
-        wnd.style.position = "absolute";
-        wnd.style.left = `${12 + (i % 4) * dx}px`;
-        wnd.style.top = `${12 + Math.floor(i / 4) * dy}px`;
+        wnd.setVisible(true);
+        wnd.setPosition(12 + (i % 4) * dx, 12 + Math.floor(i / 4) * dy);
     }
 }
 
