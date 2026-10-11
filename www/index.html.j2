@@ -36,13 +36,17 @@
 </head>
 
 <body>
-    <div id="FATAL" style="display: none;">
-        <p>THE DEV HAS FUCKED UP:</p>
-        <p id="FATALITY"></p>
+    <div id="banner" class="overlay">
+        <div id="BANNER"></div>
     </div>
 
-    <div id="GAME" class="overlay">
-        <div id="BUTTONS" class="overlay"></div>
+    <div id="BUTTONS" class="overlay"></div>
+
+    <div id="FATAL" style="display: none;">
+        <div>
+            <p>THE DEV HAS FUCKED UP:</p>
+            <p id="FATALITY"></p>
+        </div>
     </div>
 
     <script src="/game.js{{ nocache }}"></script>

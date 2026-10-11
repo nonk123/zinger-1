@@ -11,10 +11,10 @@ if (!Array.prototype.pick) {
 
 function fatal(reason) {
     console.error(reason);
+    game.reset();
 
     FATALITY.textContent = String(reason);
-    FATAL.style.display = "block";
-    GAME.style.display = "none";
+    FATAL.style.display = "flex";
 }
 
 function die() {
@@ -23,16 +23,16 @@ function die() {
 
 const game = {
     citizens: [],
-    gamestate: [],
+    gamestate: null,
 
-    push(gs) {
-        if ("init" in gs) gs.init();
-        this.gamestate.push(gs);
-    },
+    transition(gs) {
+        if (this.gamestate !== null && "deinit" in this.gamestate)
+            this.gamestate.deinit();
 
-    pop() {
-        const gs = this.gamestate.pop();
-        if (gs !== undefined && "deinit" in gs) gs.deinit();
+        this.gamestate = gs;
+
+        if ("init" in this.gamestate)
+            this.gamestate.init();
     },
 
     makeAdFor(citizen) {
@@ -91,60 +91,103 @@ const game = {
         return wnd;
     },
 
-    nextAd() {
+    reset() {
+        BUTTONS.innerHTML = "";
+    },
+
+    makeNextAd() {
         return this.makeAdFor(this.citizens.pick());
-    }
+    },
 };
 
 const kb = {};
 
 window.addEventListener("keydown", ev => {
-    console.info(`${ev.code} down`);
     kb[ev.code] = true;
 });
 
 window.addEventListener("keyup", ev => {
-    console.info(`${ev.code} up`);
     kb[ev.code] = false;
 });
 
+let mbPrev = {};
+
+const mb = {
+    justPressed(button) {
+        return !mbPrev[button] && this[button];
+    }
+};
+
+window.addEventListener("mousedown", ev => {
+    mb[ev.button] = true;
+});
+
+window.addEventListener("mouseup", ev => {
+    mb[ev.button] = false;
+});
+
 const gsm = {
-    Test: {
+    Restart: {
+        tainted: false,
+
+        init() {
+            BANNER.textContent = `Click to ${this.tainted ? "restart" : "begin"}`;
+        },
+
+        deinit() {
+            BANNER.textContent = "";
+        },
+
+        tick() {
+            if (mb.justPressed(0)) {
+                this.tainted = true;
+                return gsm.Play;
+            } else {
+                return true;
+            }
+        }
+    },
+
+    Play: {
         init() {
             const dx = 200, dy = 100;
             const cols = 5, count = 40;
 
             for (let i = 0; i < count; i++) {
-                const wnd = game.nextAd();
+                const wnd = game.makeNextAd();
                 wnd.setVisible(true);
                 wnd.setPosition(12 + (i % cols) * dx, 12 + Math.floor(i / cols) * dy);
             }
         },
 
+        deinit() {
+            game.reset();
+        },
+
         tick() {
-            return !kb["Escape"];
+            return kb["Escape"] ? gsm.Restart : true;
         }
     }
 };
 
 function main(citizens) {
     game.citizens = citizens;
-    game.push(gsm.Test);
+    game.transition(gsm.Restart);
 
     function tick() {
-        function end() {
+        const gs = game.gamestate;
+        const next = "tick" in gs ? gs.tick() : null;
+        mbPrev = { ...mb };
+
+        if (next === null) {
             fatal("you killed the game!!!");
+            return;
         }
 
-        if (game.gamestate.length === 0)
-            end();
+        if (next !== true)
+            game.transition(next);
 
-        const gs = game.gamestate[game.gamestate.length - 1];
-
-        if (!("tick" in gs) || gs.tick() === true)
-            requestAnimationFrame(tick);
-        else
-            end();
+        requestAnimationFrame(tick);
     }
 
     requestAnimationFrame(tick);

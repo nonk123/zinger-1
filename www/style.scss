@@ -22,12 +22,16 @@ body {
     grid-template-rows: 1fr $viewport-height 1fr;
     grid-template-columns: 1fr $viewport-width 1fr;
 
-    background: $bg;
-    color: $fg;
-
     >* {
         grid-area: c;
     }
+}
+
+body,
+// v just so it covers everything behind it
+#FATAL {
+    background: $bg;
+    color: $fg;
 }
 
 .overlay {
@@ -39,10 +43,6 @@ body {
 
     box-sizing: border-box;
     overflow: hidden;
-}
-
-#FATAL {
-    margin: 0 auto;
 }
 
 .ad {
@@ -106,4 +106,20 @@ body {
         image-rendering: crisp-edges;
         image-rendering: pixelated;
     }
+}
+
+#banner,
+#FATAL {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+}
+
+#BANNER,
+#FATAL>* {
+    margin: 0 auto;
+}
+
+#FATAL {
+    z-index: 1;
 }
