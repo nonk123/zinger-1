@@ -22,8 +22,11 @@ function die() {
 }
 
 const game = {
-    citizens: [],
+    availableCitizens: [],
     gamestate: null,
+
+    dt: 0,
+    time: 0,
 
     transition(gs) {
         if (this.gamestate !== null && "deinit" in this.gamestate)
@@ -86,6 +89,8 @@ const game = {
         }
 
         wnd.setVisible(false);
+        wnd.setPosition(0, 0);
+
         BUTTONS.appendChild(wnd);
 
         return wnd;
@@ -96,7 +101,7 @@ const game = {
     },
 
     makeNextAd() {
-        return this.makeAdFor(this.citizens.pick());
+        return this.makeAdFor(this.availableCitizens.pick());
     },
 };
 
@@ -149,15 +154,23 @@ const gsm = {
     },
 
     Play: {
-        init() {
-            const dx = 200, dy = 100;
-            const cols = 5, count = 40;
+        timer: 0,
+        spawnRate: 0,
 
-            for (let i = 0; i < count; i++) {
-                const wnd = game.makeNextAd();
-                wnd.setVisible(true);
-                wnd.setPosition(12 + (i % cols) * dx, 12 + Math.floor(i / cols) * dy);
-            }
+        preloadCount: 20,
+        bufferedAds: [],
+
+        preload() {
+            while (this.bufferedAds.length < this.preloadCount)
+                this.bufferedAds.push(game.makeNextAd());
+        },
+
+        init() {
+            this.timer = 0;
+            this.spawnRate = 1;
+
+            this.bufferedAds = [];
+            this.preload();
         },
 
         deinit() {
@@ -165,34 +178,58 @@ const gsm = {
         },
 
         tick() {
+            this.timer += game.dt * this.spawnRate;
+
+            while (this.timer >= 1) {
+                this.preload();
+
+                const ad = this.bufferedAds.shift();
+                ad.setVisible(true);
+
+                this.timer -= 1;
+            }
+
             return kb["Escape"] ? gsm.Restart : true;
         }
     }
 };
 
 function main(citizens) {
-    game.citizens = citizens;
+    game.availableCitizens = citizens;
     game.transition(gsm.Restart);
 
-    function tick() {
-        const gs = game.gamestate;
-        const next = "tick" in gs ? gs.tick() : null;
-        mbPrev = { ...mb };
+    let elapsed = 0;
 
-        if (next === null) {
-            fatal("you killed the game!!!");
-            return;
+    function tick(now) {
+        try {
+            if (!elapsed) elapsed = now;
+
+            game.dt = (now - elapsed) / 1000;
+            game.time = now / 1000;
+
+            elapsed = now;
+
+            const gs = game.gamestate;
+            const next = "tick" in gs ? gs.tick() : null;
+            mbPrev = { ...mb };
+
+            if (next === null) {
+                fatal("you killed the game!!!");
+                return;
+            }
+
+            if (next !== true)
+                game.transition(next);
+
+            requestAnimationFrame(tick);
+        } catch (msg) {
+            fatal(msg);
         }
-
-        if (next !== true)
-            game.transition(next);
-
-        requestAnimationFrame(tick);
     }
 
     requestAnimationFrame(tick);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    fetch("/citizens.json").then(r => r.json()).then(main).catch(reason => fatal(reason))
+    fetch("/citizens.json").then(r => r.json()).then(main).catch(fatal);
 });
